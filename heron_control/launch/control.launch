@@ -11,6 +11,8 @@
     <remap from="gps/fix" to="navsat/fix" />
     <rosparam param="datum" subst_value="True">[$(optenv GPS_DATUM 42.358436, -71.087448), 0.0]</rosparam>
     <param name="wait_for_datum" value="$(eval optenv('GPS_DATUM') != '')" />
+    <param name="magnetic_declination_radians" value=14.2 >
+    
   </node>
 
   <node pkg="heron_control" type="vel_cov" name="navsat_vel_cov" >
