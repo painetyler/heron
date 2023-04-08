@@ -9,11 +9,13 @@
   <node pkg="robot_localization" type="navsat_transform_node" name="navsat_transform_node" respawn="true" output="screen">
     <rosparam command="load" file="$(find heron_control)/config/navsat_config.yaml" />
     <remap from="gps/fix" to="navsat/fix" />
-    <rosparam param="datum" subst_value="True">[$(optenv GPS_DATUM 43.4720948, -80.5592608), 0.0]</rosparam>
+    <rosparam param="datum" subst_value="True">[$(optenv GPS_DATUM 42.358436, -71.087448), 0.0]</rosparam>
     <param name="wait_for_datum" value="$(eval optenv('GPS_DATUM') != '')" />
   </node>
 
-  <node pkg="heron_control" type="vel_cov" name="navsat_vel_cov" />
+  <node pkg="heron_control" type="vel_cov" name="navsat_vel_cov" >
+    <param name="interpret_nan_vel_as_zero" value="true" />	 
+  </node>
 
   <!-- Override the default control parameters, see config/empty.yaml for default. -->
   <rosparam command="load" file="$(arg config_extras)" />

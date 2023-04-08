@@ -27,6 +27,7 @@ import numpy as np
 from geometry_msgs.msg import TwistStamped
 from geometry_msgs.msg import TwistWithCovarianceStamped
 from sensor_msgs.msg import NavSatFix
+from math import isnan
 
 def navfix_cb(msg):
     global covariance
@@ -38,6 +39,7 @@ def navfix_cb(msg):
 def navsat_cb(msg):
     global vel_pub
     global covariance
+    global interpret_nan_vel_as_zero
 
     new_msg = TwistWithCovarianceStamped()
 
@@ -45,14 +47,30 @@ def navsat_cb(msg):
     new_msg.twist.twist = msg.twist
     new_msg.twist.covariance = covariance
 
+    # Reset nan to zero velocity if configured.
+    # Assumes the nan values indicate no heading info
+    # from the GPS RMC message (the field is blank)
+    # which happens when the vehicle is not moving, but
+    # this may not always be the case.
+    if (interpret_nan_vel_as_zero):
+        if isnan(new_msg.twist.twist.linear.x):
+            new_msg.twist.twist.linear.x = 0.0
+        
+        if isnan(new_msg.twist.twist.linear.y):
+            new_msg.twist.twist.linear.y = 0.0
+       
     vel_pub.publish(new_msg)
 
 
+    
 def add_cov():
     global vel_pub
     global covariance
+    global interpret_nan_vel_as_zero
 
     rospy.init_node("navsat_vel_cov")
+        
+    interpret_nan_vel_as_zero = rospy.get_param('~interpret_nan_vel_as_zero', False)
 
     navsat_sub = rospy.Subscriber("navsat/vel", TwistStamped, navsat_cb)
     navfix_sub = rospy.Subscriber("navsat/fix", NavSatFix, navfix_cb)
