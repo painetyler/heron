@@ -1,6 +1,5 @@
 frequency: 20
 delay: 0.0
-magnetic_declination_radians: 0
 yaw_offset: 0.0
 zero_altitude: false
 broadcast_utm_transform: true
