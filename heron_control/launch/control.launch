@@ -16,7 +16,9 @@
   </node>
 
   <node pkg="heron_control" type="vel_cov" name="navsat_vel_cov" >
-    <param name="interpret_nan_vel_as_zero" value="true" />	 
+    <param name="interpret_nan_vel_as_zero" value="true" />
+    <param name="gps_vel_variance_scale" value="4.0" />
+
   </node>
 
   <!-- Override the default control parameters, see config/empty.yaml for default. -->

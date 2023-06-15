@@ -31,10 +31,11 @@ from math import isnan
 
 def navfix_cb(msg):
     global covariance
+    global vel_var_scale
 
-    covariance[0] = msg.position_covariance[0]
-    covariance[7] = msg.position_covariance[4]
-    covariance[14] = msg.position_covariance[8]
+    covariance[0] = vel_var_scale*msg.position_covariance[0]
+    covariance[7] = vel_var_scale*msg.position_covariance[4]
+    covariance[14] = vel_var_scale*msg.position_covariance[8]
 
 def navsat_cb(msg):
     global vel_pub
@@ -67,10 +68,17 @@ def add_cov():
     global vel_pub
     global covariance
     global interpret_nan_vel_as_zero
+    global vel_var_scale
 
     rospy.init_node("navsat_vel_cov")
         
     interpret_nan_vel_as_zero = rospy.get_param('~interpret_nan_vel_as_zero', False)
+    
+    # Expose a tuning parameter for the downstream ekf.
+    # Assume the variance of the velocity calculated via the GPS is a scalar
+    # number multiplied by the covariance (rather variance) of the position esimate
+    # given by the GPS module. 
+    vel_var_scale = rospy.get_param('~gps_vel_variance_scale', 1.0)
 
     navsat_sub = rospy.Subscriber("navsat/vel", TwistStamped, navsat_cb)
     navfix_sub = rospy.Subscriber("navsat/fix", NavSatFix, navfix_cb)
